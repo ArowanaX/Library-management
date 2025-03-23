@@ -13,7 +13,7 @@ func NewUserRepo(db *gorm.DB) UserRepo {
 	return UserRepo{}
 }
 
-func (repo UserRepo) FindByID(id int) (*domain.User, error) {
+func (repo UserRepo) FindByID(id uint) (*domain.User, error) {
 	var user domain.User
 	if err := repo.DB.First(&user, id).Error; err != nil {
 		return nil, err

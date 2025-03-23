@@ -11,5 +11,5 @@ type Book struct {
 	Author      string    `gorm:"type:varchar(255);not null"`
 	ISBN        string    `gorm:"type:varchar(20);unique;not null"`
 	PublishedAt time.Time `gorm:"not null"`
-	Copies      int       `gorm:"not null;default:1"`
+	Copies      uint      `gorm:"not null;default:1"`
 }
