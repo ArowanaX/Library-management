@@ -12,14 +12,14 @@ type BookRepo struct {
 func NewBookRepo(db *gorm.DB) *BookRepo {
 	return &BookRepo{DB: db}
 }
-func (repo *BookRepo) CreateBook(book domain.Book) (*domain.Book, error) {
-	return repo.DB.Create(&book).Error
+func (repo *BookRepo) CreateBook(book *domain.Book) error {
+	return repo.DB.Create(book).Error
 }
-func (repo *BookRepo) UpdateBook(book domain.Book) (*domain.Book, error) {
-	return repo.DB.Save(&book).Error
+func (repo *BookRepo) UpdateBook(id uint, fields map[string]interface{}) error {
+	return repo.DB.Model(&domain.Book{}).Where("id = ?", id).Updates(fields).Error
 }
-func (repo *BookRepo) DeleteBook(book domain.Book) error {
-	return repo.DB.Delete(&book).Error
+func (repo *BookRepo) DeleteBook(id uint) error {
+	return repo.DB.Delete(&domain.Book{}, id).Error
 }
 func (repo *BookRepo) GetBookById(id string) (*domain.Book, error) {
 	var book domain.Book
