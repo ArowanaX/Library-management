@@ -25,12 +25,12 @@ func (repo LoanRepo) BookExist(book *domain.Book) (bool, error) {
 	return true, nil
 
 }
-func (repo LoanRepo) GetUserLoan(bookID uint, userID uint) (*domain.Loan, error) {
-	var loans *domain.Loan
-	if err := repo.DB.Where("book_id = ? and user_id = ?", bookID, userID).First(&loans).Error; err != nil {
+func (repo LoanRepo) GetUserLoanObj(userID uint, bookID uint) (*domain.Loan, error) {
+	var loan *domain.Loan
+	if err := repo.DB.Where("book_id = ? and user_id = ?", bookID, userID).First(&loan).Error; err != nil {
 		return nil, err
 	}
-	return loans, nil
+	return loan, nil
 }
 func (repo LoanRepo) ReturnLoan(loan *domain.Loan) error {
 	loan.Returned = true
@@ -53,15 +53,14 @@ func (repo LoanRepo) IncreaseCopies(book *domain.Book) error {
 	}
 	return nil
 }
+func (repo LoanRepo) GetBookByID(bookID uint) (*domain.Book, error) {
+	var book *domain.Book
+	if err := repo.DB.First(&book, bookID).Error; err != nil {
+		return nil, err
+	}
+	return book, nil
+}
 func (repo LoanRepo) LoanBook(userID uint, bookID uint) (*domain.Loan, error) {
-	//var book domain.Book
-
-	//if err := repo.DB.First(&book, bookID).Error; err != nil {
-	//	return nil, errors.New("book not found")
-	//}
-	//if booked.Copies <= 0 {
-	//	return nil, errors.New("no copies available")
-	//}
 
 	// Create new loan
 	loan := domain.Loan{
@@ -74,12 +73,6 @@ func (repo LoanRepo) LoanBook(userID uint, bookID uint) (*domain.Loan, error) {
 	if err := repo.DB.Create(&loan).Error; err != nil {
 		return nil, err
 	}
-	//
-	//// Decrease on copy
-	//book.Copies -= 1
-	//if err := repo.DB.Save(&book).Error; err != nil {
-	//	return nil, err
-	//}
 
 	return &loan, nil
 }
@@ -90,28 +83,17 @@ func (repo LoanRepo) UserLoanList(userID uint) ([]*domain.Loan, error) {
 	}
 	return loans, nil
 }
+func (repo LoanRepo) HasActiveLoans(userID uint) (bool, error) {
+	var count int64
 
-//func (repo LoanRepo) UserReturnLoan(bookID uint, userID uint) ([]*domain.Loan, error) {
-//Get loan and book
-//var loans *domain.Loan
-//if err := repo.DB.Where("book_id = ? and user_id = ?", bookID, userID).First(&loans).Error; err != nil {
-//	return nil, err
-//}
+	err := repo.DB.Model(&domain.Loan{}).
+		Where("user_id = ? AND return_date IS NULL", userID).
+		Count(&count).
+		Error
 
-//var book domain.Book
-// Book exist
-//if err := repo.DB.First(&book, bookID).Error; err != nil {
-//	return nil, errors.New("book not found")
-//}
-//Complete Loan
-//loans.Returned = true
-//if err := repo.DB.Save(loans).Error; err != nil {
-//	return nil, err
-//}
-//++1 Copies
-//book.Copies += 1
-//if err := repo.DB.Save(&book).Error; err != nil {
-//	return nil, err
-//}
-//return []*domain.Loan{loans}, nil
-//}
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
