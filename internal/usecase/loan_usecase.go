@@ -58,7 +58,7 @@ func (l *loanUseCase) LoanBook(userID uint, bookID uint) (*domain.Loan, error) {
 	// Update book inventory by decreasing available copies
 	err = l.loanRepo.DecreaseCopies(book)
 	if err != nil {
-		// Consider rollback of loan creation here if decreasing copies fails
+		//TODO: Consider rollback of loan creation here if decreasing copies fails
 		return nil, err
 	}
 
