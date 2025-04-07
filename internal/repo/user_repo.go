@@ -10,7 +10,7 @@ type UserRepo struct {
 }
 
 func NewUserRepo(db *gorm.DB) UserRepo {
-	return UserRepo{}
+	return UserRepo{DB: db}
 }
 
 func (repo UserRepo) FindByID(id uint) (*domain.User, error) {
@@ -25,7 +25,7 @@ func (repo UserRepo) Register(user *domain.User) error {
 }
 func (repo UserRepo) Login(email string, password string) (*domain.User, error) {
 	var user domain.User
-	if err := repo.DB.First(&user, email, password).Error; err != nil {
+	if err := repo.DB.Where("email = ? AND password = ?", email, password).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil

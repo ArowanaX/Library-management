@@ -26,11 +26,11 @@ func (repo LoanRepo) BookExist(book *domain.Book) (bool, error) {
 
 }
 func (repo LoanRepo) GetUserLoanObj(userID uint, bookID uint) (*domain.Loan, error) {
-	var loan *domain.Loan
+	var loan domain.Loan
 	if err := repo.DB.Where("book_id = ? and user_id = ?", bookID, userID).First(&loan).Error; err != nil {
 		return nil, err
 	}
-	return loan, nil
+	return &loan, nil
 }
 func (repo LoanRepo) ReturnLoan(loan *domain.Loan) error {
 	loan.Returned = true
@@ -54,11 +54,11 @@ func (repo LoanRepo) IncreaseCopies(book *domain.Book) error {
 	return nil
 }
 func (repo LoanRepo) GetBookByID(bookID uint) (*domain.Book, error) {
-	var book *domain.Book
+	var book domain.Book
 	if err := repo.DB.First(&book, bookID).Error; err != nil {
 		return nil, err
 	}
-	return book, nil
+	return &book, nil
 }
 func (repo LoanRepo) LoanBook(userID uint, bookID uint) (*domain.Loan, error) {
 
@@ -87,7 +87,7 @@ func (repo LoanRepo) HasActiveLoans(userID uint) (bool, error) {
 	var count int64
 
 	err := repo.DB.Model(&domain.Loan{}).
-		Where("user_id = ? AND return_date IS NULL", userID).
+		Where("user_id = ? AND returned = false", userID).
 		Count(&count).
 		Error
 
