@@ -10,7 +10,7 @@ type BookUseCase interface {
 	AddBook(book *domain.Book) error
 	EditBook(id uint, fields map[string]interface{}) error
 	DeleteBook(id uint) error
-	GetBook(id string) (*domain.Book, error)
+	GetBook(id uint) (*domain.Book, error)
 	GetBookList() ([]domain.Book, error)
 }
 
@@ -45,7 +45,7 @@ func (u *bookUseCase) DeleteBook(id uint) error {
 	return u.bookRepo.DeleteBook(id)
 }
 
-func (u *bookUseCase) GetBook(id string) (*domain.Book, error) {
+func (u *bookUseCase) GetBook(id uint) (*domain.Book, error) {
 	return u.bookRepo.GetBookById(id)
 }
 
